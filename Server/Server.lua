@@ -1,6 +1,6 @@
 --Update Check
 
-local LatestVersion = ''; CurrentVersion = '2.0.0'
+local LatestVersion = ''; CurrentVersion = '2.0.1'
 local GithubResourceName = 'VehicleLiveryMenu'
 
 PerformHttpRequest('https://raw.githubusercontent.com/Flatracer/FiveM_Resources/master/' .. GithubResourceName .. '/VERSION', function(Error, NewestVersion, Header)
@@ -28,11 +28,11 @@ PerformHttpRequest('https://raw.githubusercontent.com/Flatracer/FiveM_Resources/
 end)
 
 RegisterCommand('DownloadVLM', function()
-	if CurrentVersion ~= LatestVersion then
+	if IsDuplicityVersion() and CurrentVersion ~= LatestVersion then
 		if os.getenv('HOME') then
-			os.execute('open https://forum.fivem.net/t/release-1-0-vehicle-livery-menu/40524')
+			os.execute('open https://forum.fivem.net/t/release-vehicle-livery-menu/40524')
 		else
-			os.execute('start https://forum.fivem.net/t/release-1-0-vehicle-livery-menu/40524')
+			os.execute('start https://forum.fivem.net/t/release-vehicle-livery-menu/40524')
 		end
 	end
 end)

@@ -1,9 +1,9 @@
 local Items = {['Vehicle'] = {['Native'] = {}, ['Mod'] = {}}, ['Trailer'] = {['Native'] = {}, ['Mod'] = {}}}
-local Pool = MenuPool.New()
+local Menupool = MenuPool.New()
 local MainMenu = UIMenu.New(GetLabelText('VEH_LIVERY'):gsub('%(', ''):gsub('%)', ''), '~b~' .. GetLabelText('collision_3esfcr'))
-local TrailerMenu, MenuExists, Vehicle, GotTrailer, TrailerHandle
+local TrailerMenu, MenuExists, Vehicle, GotTrailer, TrailerHandle, DeletingMenu
 local Vehicle = 0; GotTrailer = false; TrailerHandle = 0;
-Pool:Add(MainMenu)
+Menupool:Add(MainMenu)
 
 -- Actual Menu [
 
@@ -21,7 +21,9 @@ Citizen.CreateThread(function() --Controls
 	while true do
 		Citizen.Wait(0)
 
-        Pool:ProcessMenus()
+		if not DeletingMenu then
+			Menupool:ProcessMenus()
+		end
 		
 		local IsInVehicle = IsPedInAnyVehicle(PlayerPedId(), false)
 
@@ -88,7 +90,7 @@ function VLM.CreateMenu(Got, Handle)
 
 				for LiveryID = 0, GetVehicleLiveryCount(TrailerHandle) - 1 do
 					if not TrailerMenu then
-						TrailerMenu = Pool:AddSubMenu(MainMenu, GetLabelText('TRAILER'), '~b~' .. GetLabelText('collision_3esfcr') .. ' - ' .. GetLabelText('TRAILER'))
+						TrailerMenu = Menupool:AddSubMenu(MainMenu, GetLabelText('TRAILER'), '~b~' .. GetLabelText('collision_3esfcr') .. ' - ' .. GetLabelText('TRAILER'))
 					end
 					
 					local Item = UIMenuItem.New(GetLabelText(GetLiveryName(TrailerHandle, LiveryID)), GetLabelText('collision_wcy30') .. ' ' .. GetLabelText(GetLiveryName(TrailerHandle, LiveryID)))
@@ -98,7 +100,7 @@ function VLM.CreateMenu(Got, Handle)
 				
 				for LiveryID = 0, GetNumVehicleMods(TrailerHandle, 48) - 1 do
 					if not TrailerMenu then
-						TrailerMenu = Pool:AddSubMenu(MainMenu, GetLabelText('TRAILER'), '~b~' .. GetLabelText('collision_3esfcr') .. ' - ' .. GetLabelText('TRAILER'))
+						TrailerMenu = Menupool:AddSubMenu(MainMenu, GetLabelText('TRAILER'), '~b~' .. GetLabelText('collision_3esfcr') .. ' - ' .. GetLabelText('TRAILER'))
 					end
 					
 					if LiveryID == 0 then
@@ -133,30 +135,23 @@ function VLM.CreateMenu(Got, Handle)
 			end
 			
 	if GetVehicleLiveryCount(Vehicle) > 0 or GetNumVehicleMods(Vehicle, 48) > 0 or GetVehicleLiveryCount(TrailerHandle) > 0 or GetNumVehicleMods(TrailerHandle, 48) > 0 then
-		Pool:RefreshIndex()
+		Menupool:RefreshIndex()
 		MenuExists = true
 	end
 end
 
 function VLM.DeleteMenu()
+	DeletingMenu = true
 	Vehicle = 0
 	GotTrailer = false
 	TrailerHandle = 0
 	Items = {['Vehicle'] = {['Native'] = {}, ['Mod'] = {}}, ['Trailer'] = {['Native'] = {}, ['Mod'] = {}}}
-	if TrailerMenu then
-		TrailerMenu:Clear()
-	end
-	TrailerMenu = nil
-	if MainMenu then
-		if MainMenu:Visible() then
-			MainMenu:Visible(false)
-		end
-
-		MainMenu:Clear()
-	end
-	Pool:Clear()
-	Pool:Remove()
+	
+	Menupool = MenuPool.New()
+	MainMenu = UIMenu.New(GetLabelText('VEH_LIVERY'):gsub('%(', ''):gsub('%)', ''), '~b~' .. GetLabelText('collision_3esfcr'))
+	Menupool:Add(MainMenu)
 	MenuExists = false
+	DeletingMenu = false
 end
 
 function VLM.CheckStuff()
