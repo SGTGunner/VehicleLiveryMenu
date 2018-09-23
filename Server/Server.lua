@@ -27,8 +27,8 @@ PerformHttpRequest('https://raw.githubusercontent.com/Flatracer/FiveM_Resources/
 	end)
 end)
 
-RegisterCommand('DownloadVLM', function()
-	if IsDuplicityVersion() and CurrentVersion ~= LatestVersion then
+AddEventHandler('rconCommand', function(Name, Arguments)
+	if Name == 'DownloadVLM' and CurrentVersion ~= LatestVersion then
 		if os.getenv('HOME') then
 			os.execute('open https://forum.fivem.net/t/release-vehicle-livery-menu/40524')
 		else
